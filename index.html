@@ -274,6 +274,8 @@
   }
   .portrait-box svg{width:44px;height:44px;opacity:.6;}
   .portrait-box .pb-label{font-family:var(--font-mono);font-size:12px;max-width:22ch;}
+  .portrait-box.has-photo{border:none;background:transparent;padding:0;aspect-ratio:1/1;}
+  .portrait-box.has-photo img{width:100%;height:100%;object-fit:contain;display:block;}
 
   .side-card{
     margin-top:20px;border:1px solid var(--border);border-radius:var(--radius);
@@ -304,8 +306,6 @@
   }
   .project:last-child{border-bottom:1px solid var(--border);}
   @media (max-width:900px){ .project{grid-template-columns:1fr;gap:28px;} }
-  .project:nth-child(even) .project-visual{order:2;}
-  @media (max-width:900px){ .project:nth-child(even) .project-visual{order:0;} }
 
   .project-visual{
     aspect-ratio:16/11;border:1px solid var(--border);border-radius:var(--radius);
@@ -333,6 +333,136 @@
   .p-tech{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
   .p-actions{display:flex;gap:10px;flex-wrap:wrap;}
 
+  /* Project groups */
+  .projects-list .project:nth-child(even) .project-visual{order:2;}
+  @media (max-width:900px){ .projects-list .project:nth-child(even) .project-visual{order:0;} }
+  .projects-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:72px 0 8px;}
+  .projects-group-head:first-of-type{margin-top:0;}
+  .projects-group-head h3{font-size:20px;}
+  .projects-group-head span{font-family:var(--font-mono);font-size:12px;color:var(--text-faint);}
+
+  /* ---- Project gallery ---- */
+  .project-visual.has-gallery{display:block;cursor:zoom-in;background:var(--surface-2);}
+  .pg-track{position:absolute;inset:0;}
+  .pg-slide{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    opacity:0;transform:scale(1.03);transition:opacity .5s ease, transform .7s ease;
+  }
+  .pg-slide.is-active{opacity:1;transform:scale(1);}
+  .project-visual.has-gallery:hover .pg-slide.is-active{transform:scale(1.025);}
+  .pg-shade{position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(to top, rgba(0,0,0,.55), transparent);pointer-events:none;opacity:.9;}
+  .pg-count{
+    position:absolute;top:14px;right:14px;z-index:2;
+    font-family:var(--font-mono);font-size:11.5px;color:#fff;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.16);padding:4px 10px;border-radius:999px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .pg-count svg{width:12px;height:12px;}
+  .pg-zoom{
+    position:absolute;top:14px;left:14px;z-index:2;width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.16);opacity:0;transition:opacity .25s ease;
+  }
+  .pg-zoom svg{width:15px;height:15px;}
+  .project-visual.has-gallery:hover .pg-zoom{opacity:1;}
+  .pg-nav{
+    position:absolute;top:50%;z-index:2;transform:translateY(-50%);
+    width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.18);
+    background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    opacity:0;transition:opacity .25s ease, background-color .2s ease;
+  }
+  .pg-nav svg{width:16px;height:16px;}
+  .pg-nav:hover{background:rgba(0,0,0,.7);}
+  .pg-prev{left:12px;} .pg-next{right:12px;}
+  .project-visual.has-gallery:hover .pg-nav{opacity:1;}
+  @media (hover:none){ .pg-nav, .pg-zoom{opacity:1;} }
+  .pg-thumbs{
+    position:absolute;left:0;right:0;bottom:12px;z-index:2;
+    display:flex;justify-content:center;gap:8px;padding:0 12px;
+  }
+  .pg-thumb{
+    width:46px;height:32px;border-radius:4px;overflow:hidden;padding:0;
+    border:1.5px solid rgba(255,255,255,.35);background:#000;opacity:.65;
+    transition:opacity .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .pg-thumb img{width:100%;height:100%;object-fit:cover;}
+  .pg-thumb:hover{opacity:.95;transform:translateY(-2px);}
+  .pg-thumb.is-active{opacity:1;border-color:var(--accent);}
+  @media (max-width:520px){ .pg-thumb{width:36px;height:26px;} }
+
+  /* ---- Lightbox ---- */
+  .lightbox{
+    position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;
+    background:rgba(8,9,11,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    opacity:0;visibility:hidden;transition:opacity .25s ease, visibility .25s ease;
+  }
+  .lightbox.is-open{opacity:1;visibility:visible;}
+  body.lb-open{overflow:hidden;}
+  body.lb-open .cur-dot, body.lb-open .cur-ring{display:none;}
+  body.lb-open.has-custom-cursor, body.lb-open.has-custom-cursor *{cursor:auto;}
+  .lb-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;color:#fff;}
+  .lb-title{font-family:var(--font-display);font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lb-counter{font-family:var(--font-mono);font-size:12px;opacity:.65;margin-left:10px;font-weight:400;}
+  .lb-btn{
+    width:42px;height:42px;border-radius:50%;flex-shrink:0;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;
+    display:flex;align-items:center;justify-content:center;transition:background-color .2s ease;
+  }
+  .lb-btn:hover{background:rgba(255,255,255,.16);}
+  .lb-btn svg{width:18px;height:18px;}
+  .lb-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:0 76px;min-height:0;}
+  @media (max-width:640px){ .lb-stage{padding:0 12px;} }
+  .lb-img{
+    max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);transition:opacity .2s ease, transform .25s ease;user-select:none;
+  }
+  .lb-img.is-loading{opacity:0;transform:scale(.98);}
+  .lb-stage .lb-btn{position:absolute;top:50%;transform:translateY(-50%);}
+  .lb-prev{left:18px;} .lb-next{right:18px;}
+  @media (max-width:640px){ .lb-stage .lb-btn{top:auto;bottom:-58px;transform:none;} .lb-prev{left:calc(50% - 52px);} .lb-next{right:calc(50% - 52px);} }
+  .lb-strip{display:flex;gap:10px;justify-content:center;padding:18px 22px 24px;overflow-x:auto;}
+  @media (max-width:640px){ .lb-strip{padding-top:72px;} }
+  .lb-strip button{
+    flex-shrink:0;width:72px;height:50px;padding:0;border-radius:5px;overflow:hidden;
+    border:2px solid transparent;background:#000;opacity:.5;transition:opacity .2s ease, border-color .2s ease;
+  }
+  .lb-strip button img{width:100%;height:100%;object-fit:cover;}
+  .lb-strip button:hover{opacity:.85;}
+  .lb-strip button.is-active{opacity:1;border-color:var(--accent);}
+  .lb-single .lb-stage .lb-btn, .lb-single .lb-strip{display:none;}
+
+  /* ============ AWARDS ============ */
+  .awards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+  @media (max-width:760px){ .awards-grid{grid-template-columns:1fr;} }
+  .award-card{
+    position:relative;display:flex;gap:20px;padding:28px;overflow:hidden;
+    border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .award-card:hover{border-color:var(--accent-soft-border);transform:translateY(-2px);}
+  .award-card::after{
+    content:"";position:absolute;top:-60px;right:-60px;width:160px;height:160px;border-radius:50%;
+    background:radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);pointer-events:none;
+  }
+  .award-icon{
+    flex-shrink:0;width:50px;height:50px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-soft-border);
+  }
+  .award-icon svg{width:22px;height:22px;}
+  .award-year{font-family:var(--font-mono);font-size:12px;color:var(--accent);margin-bottom:6px;}
+  .award-card h3{font-size:17.5px;margin-bottom:8px;}
+  .award-card p{font-size:14.5px;color:var(--text-muted);margin-bottom:10px;}
+  .award-org{font-family:var(--font-mono);font-size:12px;color:var(--text-faint);}
+  .award-highlight{
+    display:inline-block;font-family:var(--font-mono);font-size:11.5px;color:var(--accent);
+    border:1px solid var(--accent-soft-border);background:var(--accent-soft);
+    padding:2px 9px;border-radius:999px;margin-left:8px;vertical-align:middle;
+  }
+
   /* ============ EXPERIENCE ============ */
   .timeline{border-left:1px solid var(--border);padding-left:36px;margin-left:6px;}
   .tl-item{position:relative;padding-bottom:44px;}
@@ -351,6 +481,14 @@
   .tl-resp span{font-size:14px;color:var(--text-muted);display:flex;gap:9px;align-items:flex-start;}
   .tl-resp span::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--accent);margin-top:8px;flex:none;}
   .tl-note{font-size:13.5px;color:var(--text-faint);border-left:2px solid var(--border);padding-left:14px;}
+  .tl-badge{
+    display:inline-block;vertical-align:middle;margin-left:8px;
+    font-family:var(--font-mono);font-size:11px;font-weight:400;color:var(--accent);
+    border:1px solid var(--accent-soft-border);background:var(--accent-soft);
+    padding:2px 8px;border-radius:999px;letter-spacing:0;
+  }
+  .tl-summary{font-size:14.5px;color:var(--text-muted);margin-bottom:14px;max-width:70ch;}
+  .tl-tech{font-family:var(--font-mono);font-size:12px;color:var(--text-faint);line-height:1.7;}
 
   /* ============ SERVICES ============ */
   .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--border);border-left:1px solid var(--border);}
@@ -384,18 +522,39 @@
   /* ============ CONTACT ============ */
   .contact-grid{display:grid;grid-template-columns:1fr 0.75fr;gap:64px;}
   @media (max-width:900px){ .contact-grid{grid-template-columns:1fr;gap:44px;} }
-  .field{margin-bottom:20px;}
-  .field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-mono);}
-  .field input, .field select, .field textarea{
-    width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
-    padding:13px 14px;border-radius:var(--radius);font-family:var(--font-body);font-size:14.5px;
-    transition:border-color .2s ease;
+  .contact-methods{display:flex;flex-direction:column;gap:16px;}
+  .contact-card{
+    display:flex;align-items:center;gap:20px;padding:26px;
+    border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+    transition:border-color .2s ease, transform .2s ease;
   }
-  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--text-faint);}
-  .field textarea{resize:vertical;min-height:120px;}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  @media (max-width:520px){ .field-row{grid-template-columns:1fr;} }
+  .contact-card:hover{border-color:var(--text-faint);transform:translateY(-2px);}
+  .contact-card .cc-icon{
+    flex-shrink:0;width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .contact-card .cc-icon svg{width:24px;height:24px;}
+  .contact-card .cc-icon.is-wa{background:#25D366;color:#fff;}
+  .contact-card .cc-icon.is-mail{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-soft-border);}
+  .contact-card .cc-body{flex:1;min-width:0;}
+  .contact-card .cc-label{font-family:var(--font-mono);font-size:12.5px;color:var(--text-faint);margin-bottom:4px;}
+  .contact-card .cc-value{font-family:var(--font-display);font-size:19px;font-weight:600;overflow-wrap:anywhere;}
+  .contact-card .cc-hint{font-size:13.5px;color:var(--text-muted);margin-top:4px;}
+  .contact-card .cc-arrow{width:18px;height:18px;opacity:.5;flex-shrink:0;}
   .form-note{font-size:12.5px;color:var(--text-faint);margin-top:14px;}
+  .btn .ico{width:15px;height:15px;flex-shrink:0;}
+
+  /* Floating WhatsApp button */
+  .wa-float{
+    position:fixed;right:24px;bottom:24px;z-index:150;
+    width:56px;height:56px;border-radius:50%;
+    background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 20px rgba(0,0,0,.28);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .wa-float:hover{transform:scale(1.07);box-shadow:0 8px 26px rgba(37,211,102,.4);}
+  .wa-float svg{width:30px;height:30px;}
+  @media (max-width:520px){ .wa-float{right:16px;bottom:16px;width:52px;height:52px;} }
 
   .contact-side .cs-block{border:1px solid var(--border);border-radius:var(--radius);padding:24px;background:var(--surface);margin-bottom:16px;}
   .contact-side h4{font-size:13px;color:var(--text-faint);font-family:var(--font-mono);margin-bottom:14px;}
@@ -428,6 +587,11 @@
 </style>
 </head>
 <body>
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></symbol>
+  <symbol id="ico-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 <canvas id="bgCanvas" aria-hidden="true"></canvas>
 <div class="cur-dot" id="curDot"></div>
 <div class="cur-ring" id="curRing"></div>
@@ -450,8 +614,8 @@
         <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
         <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
       </button>
-      <a href="#" class="btn btn-sm" id="resumeLink" title="Add your resume file link">Download Resume</a>
-      <a href="#contact" class="btn btn-primary btn-sm">Let's Talk</a>
+      <a href="assets/Resume%20of%20Abu%20Nayem.pdf" target="_blank" rel="noopener" download="Resume of Abu Nayem.pdf" class="btn btn-sm" id="resumeLink" title="Download Resume of Abu Nayem (PDF)">Download Resume</a>
+      <a href="https://wa.me/8801991953820?text=Hi%20Nayem%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" class="btn btn-primary btn-sm"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#ico-wa"/></svg>Let's Talk</a>
       <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" type="button">
         <svg id="iconMenu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <svg id="iconClose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -467,8 +631,8 @@
     <a href="#services">Services</a>
     <a href="#contact">Contact</a>
     <div class="mp-actions">
-      <a href="#" class="btn btn-block">Download Resume</a>
-      <a href="#contact" class="btn btn-primary btn-block">Let's Talk</a>
+      <a href="assets/Resume%20of%20Abu%20Nayem.pdf" target="_blank" rel="noopener" download="Resume of Abu Nayem.pdf" class="btn btn-block" title="Download Resume of Abu Nayem (PDF)">Download Resume</a>
+      <a href="https://wa.me/8801991953820?text=Hi%20Nayem%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" class="btn btn-primary btn-block"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#ico-wa"/></svg>Let's Talk</a>
     </div>
   </div>
 </nav>
@@ -484,7 +648,7 @@
       <div class="hero-ctas">
         <a href="#projects" class="btn btn-primary">View My Work</a>
         <a href="#contact" class="btn">Let's Connect</a>
-        <a href="#" class="btn btn-ghost" title="Add your resume file link">Download Resume ↓</a>
+        <a href="assets/Resume%20of%20Abu%20Nayem.pdf" target="_blank" rel="noopener" download="Resume of Abu Nayem.pdf" class="btn btn-ghost" title="Download Resume of Abu Nayem (PDF)">Download Resume ↓</a>
       </div>
       <div class="hero-meta">
         <div><strong>8 yrs</strong>Backend &amp; AI engineering</div>
@@ -546,14 +710,13 @@
         </div>
       </div>
       <div class="reveal">
-        <div class="portrait-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-3.6 4.4-5.6 7.5-5.6s6.1 2 7.5 5.6"/></svg>
-          <span class="pb-label">Professional portrait — replace with your photo</span>
+        <div class="portrait-box has-photo">
+          <img src="assets/images/nayem.png" alt="Portrait of Nayem" width="538" height="538" loading="lazy">
         </div>
         <div class="side-card">
           <h4 class="mono">Education</h4>
           <ul>
-            <li>B.Sc. in [Your Degree] — [University Name]</li>
+            <li>B.Sc. in Computer Science and Engineering — Green University of Bangladesh</li>
           </ul>
         </div>
       </div>
@@ -574,11 +737,19 @@
     <div class="skills-grid reveal">
       <div class="skill-card">
         <div class="sk-top"><h3>Backend Engineering</h3><span class="sk-badge">Primary</span></div>
-        <div class="sk-tags"><span>Python</span><span>Django</span><span>DRF</span><span>FastAPI</span><span>REST APIs</span><span>Architecture</span></div>
+        <div class="sk-tags">
+          <span>Python</span>
+          <span>Django</span>
+          <span>DRF</span>
+          <span>FastAPI</span>
+          <span>REST APIs</span>
+          <span>Architecture</span>
+          <span>PayloadCMS</span>
+        </div>
       </div>
       <div class="skill-card">
         <div class="sk-top"><h3>AI &amp; Intelligent Apps</h3><span class="sk-badge">Primary</span></div>
-        <div class="sk-tags"><span>LLMs</span><span>LangChain</span><span>RAG</span><span>Vector DBs</span><span>AI Chatbots</span><span>RASA</span><span>MCP Server</span><span>n8n</span></div>
+        <div class="sk-tags"><span>LLMs</span><span>LangChain</span><span>Microsoft Agent Framework</span><span>RAG</span><span>LightRAG</span><span>Vector DBs</span><span>AI Chatbots</span><span>RASA</span><span>MCP Server</span><span>n8n</span></div>
       </div>
       <div class="skill-card">
         <div class="sk-top"><h3>Database &amp; Performance</h3><span class="sk-badge secondary">Supporting</span></div>
@@ -591,6 +762,18 @@
       <div class="skill-card">
         <div class="sk-top"><h3>Frontend &amp; Mobile</h3><span class="sk-badge secondary">Supporting</span></div>
         <div class="sk-tags"><span>Next.js</span><span>React</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Flutter</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-top"><h3>IDEs &amp; AI Dev Tools</h3><span class="sk-badge secondary">Daily</span></div>
+        <div class="sk-tags"><span>VS Code</span><span>Cursor</span><span>Claude Code</span><span>Claude CLI</span><span>Antigravity</span><span>GitHub Copilot</span><span>Git</span><span>GitHub</span><span>Postman</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-top"><h3>Integrations</h3><span class="sk-badge secondary">Supporting</span></div>
+        <div class="sk-tags"><span>PayPal</span><span>Stripe</span><span>Microsoft Graph</span><span>Google Cloud Console APIs</span><span>Typesense</span><span>Zoom</span><span>Zoho</span><span>SMS Gateways</span><span>Payment Gateways</span><span>Webhooks</span></div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-top"><h3>Auth &amp; OIDC</h3><span class="sk-badge secondary">Supporting</span></div>
+        <div class="sk-tags"><span>Auth0</span><span>Okta</span><span>Keycloak</span><span>Microsoft Entra ID</span><span>Google Workspace</span><span>AWS Cognito</span><span>OAuth 2.0</span><span>OpenID Connect</span><span>SAML SSO</span><span>JWT</span></div>
       </div>
       <div class="skill-card">
         <div class="sk-top"><h3>How I work</h3></div>
@@ -606,88 +789,165 @@
     <div class="section-head reveal">
       <div class="eyebrow">Projects</div>
       <h2>Selected work &amp; product explorations.</h2>
-      <p class="lede">A mix of client backend work and independent SaaS concepts. Status and links are noted honestly below — several are in progress.</p>
+      <p class="lede">A mix of independent SaaS products and enterprise systems delivered for clients and employers. Status and links are noted honestly below — several are in progress.</p>
     </div>
 
+    <!--
+      PROJECT IMAGES
+      Add images to any project via the data-images attribute on .project-visual
+      (comma-separated paths). One image = single view, 2+ images = gallery.
+      Suggested folder: assets/images/projects/<project-name>/
+      e.g. data-images="assets/images/projects/garments-erp/1.png, assets/images/projects/garments-erp/2.png"
+      Leave it empty to show the placeholder.
+    -->
+
+    <div class="projects-group-head reveal"><h3>Products &amp; SaaS</h3><span>// independent &amp; ongoing</span></div>
+    <div class="projects-list">
     <div class="project reveal">
-      <div class="project-visual"><div class="grid-overlay"></div><span class="ph-mark">Jewelance AI — dashboard preview</span></div>
+      <div class="project-visual" data-images="assets/projects/rag-mcp.png"><div class="grid-overlay"></div><span class="ph-mark">RAG application — interface preview</span></div>
       <div class="project-body">
-        <div class="p-meta"><span class="p-cat">AI-powered Jewelry SaaS</span><span class="p-status">Status: to be confirmed</span></div>
-        <h3>Jewelance AI</h3>
-        <p class="p-desc">A multi-tenant SaaS platform for jewelry businesses, combining day-to-day business workflows with intelligent software capabilities.</p>
-        <p class="p-role"><strong>Role:</strong> Backend architecture &amp; API development</p>
-        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django REST Framework</span><span class="tag">Next.js</span><span class="tag">PostgreSQL</span><span class="tag">Multi-tenant SaaS</span></div>
-        <div class="p-actions">
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add live link when available">Live Demo</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add repository link when available">GitHub</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add case study when available">Case Study</a>
-        </div>
+        <div class="p-meta"><span class="p-cat">AI / RAG &amp; Knowledge System</span><span class="p-status">Status: to be confirmed</span></div>
+        <h3>Enterprise RAG &amp; Knowledge Intelligence Platform</h3>
+        <p class="p-desc">A Retrieval-Augmented Generation (RAG) application that ingests documents and internal data sources, indexes them with vector embeddings, and delivers accurate, context-grounded answers with source citations through a conversational interface.</p>
+        <p class="p-role"><strong>Role:</strong> RAG pipeline architecture, backend API &amp; AI integration</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">LangChain</span><span class="tag">LLM</span><span class="tag">RAG</span><span class="tag">Vector DB</span><span class="tag">Embeddings</span><span class="tag">Semantic Search</span><span class="tag">PostgreSQL</span><span class="tag">Next.js</span></div>
       </div>
     </div>
 
     <div class="project reveal">
-      <div class="project-visual"><div class="grid-overlay"></div><span class="ph-mark">Chatbot &amp; automation — workflow preview</span></div>
+      <div class="project-visual" data-images="assets/projects/n8n-chatbot.png"><div class="grid-overlay"></div><span class="ph-mark">Business automation chatbot — workflow preview</span></div>
       <div class="project-body">
-        <div class="p-meta"><span class="p-cat">AI / Automation / SaaS</span><span class="p-status">Status: to be confirmed</span></div>
-        <h3>AI Chatbot &amp; Business Automation Platform</h3>
-        <p class="p-desc">Chatbot and automation solutions for customer support, lead generation, product information, and internal workflow automation.</p>
-        <p class="p-role"><strong>Role:</strong> Backend development, AI integration &amp; chatbot architecture</p>
-        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">LangChain</span><span class="tag">RAG</span><span class="tag">n8n</span><span class="tag">WhatsApp / Messenger</span><span class="tag">Google Sheets</span></div>
-        <div class="p-actions">
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add live link when available">Live Demo</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add repository link when available">GitHub</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add case study when available">Case Study</a>
-        </div>
+        <div class="p-meta"><span class="p-cat">AI Chatbot / Omnichannel Automation</span><span class="p-status">Status: to be confirmed</span></div>
+        <h3>Business Automation Chatbot</h3>
+        <p class="p-desc">An omnichannel chatbot and workflow automation platform that automates lead capture and qualification, instant Facebook Messenger and WhatsApp replies, automated email follow-ups, and end-to-end customer communication pipelines.</p>
+        <p class="p-role"><strong>Role:</strong> Backend development, n8n workflow orchestration &amp; multi-channel integration</p>
+        <div class="p-tech"><span class="tag">n8n</span><span class="tag">Python</span><span class="tag">Django</span><span class="tag">Django REST Framework</span><span class="tag">WhatsApp Integration</span><span class="tag">Facebook Messenger API</span><span class="tag">Email Service</span><span class="tag">Webhooks</span><span class="tag">LLM</span><span class="tag">PostgreSQL</span></div>
+      </div>
+    </div>
+    </div><!-- /.projects-list -->
+
+    <div class="projects-list">
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/erp/g1.png,assets/projects/erp/g2.png"><div class="grid-overlay"></div><span class="ph-mark">Garments ERP — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">ERP / Textile &amp; Garments</span><span class="p-status">Delivered</span></div>
+        <h3>Garments ERP</h3>
+        <p class="p-desc">A fully integrated ERP for managing the complete textile-to-garments process — from raw materials and production through to finished goods.</p>
+        <p class="p-role"><strong>Role:</strong> Project planning, database &amp; system design, backend development</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">PostgreSQL</span><span class="tag">Celery</span><span class="tag">Redis</span></div>
       </div>
     </div>
 
     <div class="project reveal">
-      <div class="project-visual"><div class="grid-overlay"></div><span class="ph-mark">Scheduling dashboard — preview</span></div>
+      <div class="project-visual" data-images="assets/projects/education/1.png, assets/projects/education/2.png, assets/projects/education/3.png, assets/projects/education/4.png, assets/projects/education/5.png"><div class="grid-overlay"></div><span class="ph-mark">Education ERP — preview</span></div>
       <div class="project-body">
-        <div class="p-meta"><span class="p-cat">SaaS / Social Media</span><span class="p-status">Status: to be confirmed</span></div>
-        <h3>Social Media Management SaaS</h3>
-        <p class="p-desc">A Buffer-style platform for scheduling and managing content across multiple social platforms from one place.</p>
-        <p class="p-role"><strong>Role:</strong> Backend &amp; product development</p>
-        <div class="p-tech"><span class="tag">Django</span><span class="tag">REST API</span><span class="tag">PostgreSQL</span><span class="tag">Celery</span><span class="tag">Social integrations</span></div>
-        <div class="p-actions">
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add live link when available">Live Demo</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add repository link when available">GitHub</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add case study when available">Case Study</a>
-        </div>
+        <div class="p-meta"><span class="p-cat">ERP / Education</span><span class="p-status">Delivered</span></div>
+        <h3>Education ERP (School Management System)</h3>
+        <p class="p-desc">A large-scale ERP solution for managing educational institutions — students, academics, staff, and administration in one system, rolled out across multiple institutions.</p>
+        <p class="p-role"><strong>Role:</strong> Full-stack development &amp; implementation training</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">MySQL</span><span class="tag">Bootstrap</span></div>
       </div>
     </div>
 
     <div class="project reveal">
-      <div class="project-visual"><div class="grid-overlay"></div><span class="ph-mark">Healthcare report app — preview</span></div>
+      <div class="project-visual" data-images="assets/projects/gdl/1.png, assets/projects/gdl/2.png, assets/projects/gdl/3.png, assets/projects/gdl/4.png, assets/projects/gdl/5.png"><div class="grid-overlay"></div><span class="ph-mark">Mobile Servicing ERP — preview</span></div>
       <div class="project-body">
-        <div class="p-meta"><span class="p-cat">AI / Healthcare Software</span><span class="p-status">Status: to be confirmed</span></div>
-        <h3>AI Healthcare Report Application</h3>
-        <p class="p-desc">A software concept to help users interact with healthcare information through an AI-assisted report interface. Presented as a product concept, not a clinically validated tool.</p>
-        <p class="p-role"><strong>Role:</strong> Backend &amp; AI application development</p>
-        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">LLM</span><span class="tag">REST API</span></div>
-        <div class="p-actions">
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add live link when available">Live Demo</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add repository link when available">GitHub</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add case study when available">Case Study</a>
-        </div>
+        <div class="p-meta"><span class="p-cat">ERP / After-sales Service</span><span class="p-status">Delivered</span></div>
+        <h3>Mobile Servicing ERP — Grameen Distribution Ltd.</h3>
+        <p class="p-desc">A custom ERP for managing all mobile care centers under the company, built to handle a high daily volume of service transactions.</p>
+        <p class="p-role"><strong>Role:</strong> Backend development &amp; database design</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">PostgreSQL</span><span class="tag">High-volume data</span></div>
       </div>
     </div>
 
     <div class="project reveal">
-      <div class="project-visual"><div class="grid-overlay"></div><span class="ph-mark">Inventory dashboard — preview</span></div>
+      <div class="project-visual" data-images="assets/projects/servier-hrm/1.png, assets/projects/servier-hrm/2.png, assets/projects/servier-hrm/3.png, assets/projects/servier-hrm/4.png, assets/projects/servier-hrm/5.png"><div class="grid-overlay"></div><span class="ph-mark">HRM — preview</span></div>
       <div class="project-body">
-        <div class="p-meta"><span class="p-cat">SaaS / Business Management</span><span class="p-status">Status: to be confirmed</span></div>
-        <h3>Restaurant Inventory SaaS</h3>
-        <p class="p-desc">An inventory and operations product concept focused on stock tracking, food costs, and day-to-day restaurant workflows.</p>
-        <p class="p-role"><strong>Role:</strong> Product concept, backend architecture &amp; SaaS development</p>
-        <div class="p-tech"><span class="tag">Django</span><span class="tag">PostgreSQL</span><span class="tag">Inventory Management</span><span class="tag">SaaS</span></div>
-        <div class="p-actions">
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add live link when available">Live Demo</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add repository link when available">GitHub</a>
-          <a href="#" class="btn btn-sm is-disabled" aria-disabled="true" title="Add case study when available">Case Study</a>
-        </div>
+        <div class="p-meta"><span class="p-cat">HRM / Enterprise</span><span class="p-status">Delivered</span></div>
+        <h3>HRM for ServierBD</h3>
+        <p class="p-desc">A custom Human Resource Management system tailored to the HR operations of a multinational company.</p>
+        <p class="p-role"><strong>Role:</strong> Backend development</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">HRM</span></div>
       </div>
     </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images=""><div class="grid-overlay"></div><span class="ph-mark">POS &amp; Inventory — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">Retail / Business Management</span><span class="p-status">Delivered</span></div>
+        <h3>Multi-Branch POS &amp; Inventory</h3>
+        <p class="p-desc">A multi-branch point-of-sale and inventory system for managing daily sales, stock, and business operations across locations.</p>
+        <p class="p-role"><strong>Role:</strong> Full-stack development</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">MySQL</span><span class="tag">PostgreSQL</span><span class="tag">Next JS</span></div>
+      </div>
+    </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/rest-api-platform.png"><div class="grid-overlay"></div><span class="ph-mark">REST APIs — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">APIs / Mobile &amp; Integrations</span><span class="p-status">Multiple projects</span></div>
+        <h3>REST API Platforms for Mobile Apps</h3>
+        <p class="p-desc">Many API-based solutions powering mobile apps and third-party integrations — including API documentation and close collaboration with frontend and mobile teams.</p>
+        <p class="p-role"><strong>Role:</strong> Lead backend developer</p>
+        <div class="p-tech"><span class="tag">Django REST Framework</span><span class="tag">PostgreSQL</span><span class="tag">API Docs</span><span class="tag">Third-party APIs</span></div>
+      </div>
+    </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/ecommerce/1.png, assets/projects/ecommerce/2.png"><div class="grid-overlay"></div><span class="ph-mark">Websites &amp; E-commerce — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">Web / E-commerce</span><span class="p-status">Multiple projects</span></div>
+        <h3>Websites &amp; E-commerce</h3>
+        <p class="p-desc">Developed and contributed to many websites and web applications — e-commerce, portals, forums, blogs, business, and personal sites.</p>
+        <p class="p-role"><strong>Role:</strong> Full-stack development</p>
+        <div class="p-tech"><span class="tag">Django</span><span class="tag">DRF</span><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Bootstrap</span><span class="tag">React JS</span></div>
+      </div>
+    </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/construction-erp/1.png, assets/projects/construction-erp/2.png, assets/projects/construction-erp/3.png"><div class="grid-overlay"></div><span class="ph-mark">Construction ERP — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">ERP / Construction &amp; Supply Chain</span><span class="p-status">Delivered</span></div>
+        <h3>Construction ERP</h3>
+        <p class="p-desc">An end-to-end ERP for construction and engineering firms covering site material requisitions, purchase orders, multi-warehouse inventory &amp; stock tracking, supply chain &amp; vendor management, project BOQ &amp; accounting ledgers, HRM, role-based access control (RBAC), and automated PDF &amp; Excel reporting.</p>
+        <p class="p-role"><strong>Role:</strong> System architecture, database design &amp; full-stack development</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">Django REST Framework</span><span class="tag">PostgreSQL</span><span class="tag">Supply Chain &amp; Inventory</span><span class="tag">RBAC</span><span class="tag">Accounts &amp; HRM</span><span class="tag">PDF &amp; Excel Reports</span></div>
+      </div>
+    </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/fund-hrm/1.png, assets/projects/fund-hrm/2.png, assets/projects/fund-hrm/3.png, assets/projects/fund-hrm/4.png"><div class="grid-overlay"></div><span class="ph-mark">Fund Management ERP — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">ERP / Financial &amp; Employee Funds</span><span class="p-status">Delivered</span></div>
+        <h3>Fund Management ERP</h3>
+        <p class="p-desc">A specialized financial and employee fund management ERP designed for managing Provident Fund (PF), Gratuity Fund, Workers' Welfare Fund, Accounting, member contributions, loan &amp; settlement workflows, interest distribution, accounting ledgers, and automated PDF &amp; Excel reporting.</p>
+        <p class="p-role"><strong>Role:</strong> Database design &amp; full-stack development</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">PostgreSQL</span><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">Bootstrap</span><span class="tag">jQuery</span><span class="tag">Provident &amp; Gratuity Fund</span><span class="tag">PDF &amp; Excel Reports</span></div>
+      </div>
+    </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/quotation/1.png, assets/projects/quotation/2.png, assets/projects/quotation/3.png"><div class="grid-overlay"></div><span class="ph-mark">Quotation Management — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">B2B SaaS / Sales &amp; Billing</span><span class="p-status">Delivered</span></div>
+        <h3>Quotation Management Software</h3>
+        <p class="p-desc">A commercial quotation and billing lifecycle system with role-based user management, quotation creation, drafting, submission &amp; revision tracking, quotation-linked sales and milestone billing realization, and one-click PDF &amp; Excel reporting.</p>
+        <p class="p-role"><strong>Role:</strong> Backend architecture &amp; full-stack development</p>
+        <div class="p-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">PostgreSQL</span><span class="tag">Quotation Workflow</span><span class="tag">Sales &amp; Billing Tracking</span><span class="tag">Role-Based Access</span><span class="tag">PDF &amp; Excel Export</span></div>
+      </div>
+    </div>
+
+    <div class="project reveal">
+      <div class="project-visual" data-images="assets/projects/employee-tracker/1.png, assets/projects/employee-tracker/2.png, assets/projects/employee-tracker/3.png"><div class="grid-overlay"></div><span class="ph-mark">Employee Monitoring Tracker — preview</span></div>
+      <div class="project-body">
+        <div class="p-meta"><span class="p-cat">Desktop App / HR &amp; Workforce Analytics</span><span class="p-status">Delivered</span></div>
+        <h3>Employee Monitoring Tracker Desktop App</h3>
+        <p class="p-desc">A cross-platform Python desktop time and activity tracker integrated with a Django REST Framework backend and a Django-based web admin interface to manage the desktop client, monitor employee screen captures and active hours, and automate billing, overtime bonuses, and late/idle fine calculations.</p>
+        <p class="p-role"><strong>Role:</strong> Python desktop app, Django REST API backend &amp; admin portal development</p>
+        <div class="p-tech"><span class="tag">Python Desktop App</span><span class="tag">Django</span><span class="tag">Django REST Framework</span><span class="tag">PostgreSQL</span><span class="tag">Time &amp; Activity Tracking</span><span class="tag">Billing, Bonus &amp; Fine Engine</span><span class="tag">Admin Portal</span></div>
+      </div>
+    </div>
+    </div><!-- /.projects-list -->
   </div>
 </section>
 
@@ -701,23 +961,165 @@
     <div class="timeline reveal">
       <div class="tl-item">
         <div class="tl-head">
-          <h3>Software Engineer / Tech Lead</h3>
-          <span class="tl-period">[Employment period] — Present</span>
+          <h3>Senior Backend & AI Engineer <span class="tl-badge">Remote</span></h3>
+          <span class="tl-period">Dec 2023 — Present</span>
         </div>
-        <div class="tl-org"><em>[Company name]</em> — add your employer details</div>
+        <div class="tl-org"><em>G Group</em> — Florida (FL), USA</div>
         <div class="tl-resp">
           <span>Backend architecture &amp; REST API development</span>
           <span>Database design &amp; query optimization</span>
           <span>AI application development</span>
           <span>SaaS product development</span>
-          <span>Linux server deployment &amp; cloud infrastructure</span>
+          <span>Chatbot</span>
+          <span>MCP Server</span>
           <span>Technical leadership &amp; team collaboration</span>
         </div>
-        <p class="tl-note">Led a small development team of 2–3 developers across these projects. 8 years total experience in software engineering.</p>
+        <p class="tl-note">Senior Backend & AI Engineer specializing in building scalable backend systems, robust APIs, and intelligent AI-powered applications. Experienced in Python, Django, FastAPI, LLMs, RAG, AI Agents, and system architecture, with a focus on solving real-world business problems through practical and scalable technology.</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-head">
+          <h3>Sr. Software Engineer &amp; Team Lead <span class="tl-badge">Part-time · Remote</span></h3>
+          <span class="tl-period">Aug 2021 — July 2023</span>
+        </div>
+        <div class="tl-org">Av Tech Ltd. · London, UK</div>
+        <p class="tl-summary">Led the Bangladesh-based development team — building Django features myself while leading the Laravel and Next.js project members.</p>
+        <div class="tl-resp">
+          <span>Project management &amp; daily team stand-ups</span>
+          <span>Django feature development &amp; enhancements</span>
+          <span>Leading Laravel &amp; Next.js project teams</span>
+          <span>Git management &amp; code review</span>
+          <span>Server &amp; DevOps</span>
+          <span>Security &amp; performance analysis at all levels</span>
+          <span>Management meetings with the company owner</span>
+          <span>Monitoring, testing &amp; recruiting team members</span>
+        </div>
+        <div class="tl-tech">Django · DRF · Laravel · React · Next.js · PostgreSQL · MySQL · Tailwind CSS · Celery · Redis · Nginx · Gunicorn</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-head">
+          <h3>Backend Developer <span class="tl-badge">Part-time · Remote</span></h3>
+          <span class="tl-period">Jun 2020 — Nov 2021</span>
+        </div>
+        <div class="tl-org">Fast Despatch Logistics Ltd. (FDL) · Peterborough, UK</div>
+        <p class="tl-summary">Main developer responsible for three projects — a Django REST API platform and two Django-rendered apps, where I also handled the frontend.</p>
+        <div class="tl-resp">
+          <span>Technical requirements analysis with the PM</span>
+          <span>New features &amp; reports development</span>
+          <span>API documentation &amp; integration testing</span>
+          <span>Guiding frontend &amp; mobile app developers</span>
+          <span>Support &amp; issue resolution</span>
+          <span>Server management</span>
+        </div>
+        <div class="tl-tech">Django · DRF · HTML · CSS · JavaScript · Bootstrap</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-head">
+          <h3>Sr. Software Engineer &amp; Team Lead</h3>
+          <span class="tl-period">Dec 2020 — Nov 2023</span>
+        </div>
+        <div class="tl-org">Esquire Technology Ltd. · Tejgaon, Dhaka</div>
+        <p class="tl-summary">Supervised and led a team of 3 software engineers building the company's in-house ERP to global standards.</p>
+        <div class="tl-resp">
+          <span>Project planning &amp; management</span>
+          <span>Database &amp; system design</span>
+          <span>Integrating software with existing systems</span>
+          <span>Code, requirements &amp; risk analysis</span>
+          <span>Root-cause analysis, code review &amp; unit testing</span>
+          <span>Converting requirements into design documents</span>
+        </div>
+        <div class="tl-tech">Django · DRF · PostgreSQL · Celery · Redis · Nginx · Gunicorn · Bootstrap</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-head">
+          <h3>Software Engineer <span class="tl-badge">Remote</span></h3>
+          <span class="tl-period">Feb 2019 — Nov 2020</span>
+        </div>
+        <div class="tl-org">ISHO Limited · Banani, Dhaka</div>
+        <p class="tl-summary">Worked with the ERP and e-commerce teams, building the company ERP and integrating it with the e-commerce platform.</p>
+        <div class="tl-resp">
+          <span>Requirements analysis with the business team</span>
+          <span>ERP development &amp; e-commerce integration</span>
+          <span>Flowcharts &amp; process-flow design</span>
+          <span>User training &amp; end-user support</span>
+        </div>
+        <div class="tl-tech">Django · MySQL · HTML · CSS · JavaScript · Bootstrap</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-head">
+          <h3>Software Developer</h3>
+          <span class="tl-period">Mar 2017 — Jan 2019</span>
+        </div>
+        <div class="tl-org">Pythonbd IT Solution · Agargaon, Dhaka</div>
+        <p class="tl-summary">Built websites and web applications to client requirements.</p>
+        <div class="tl-resp">
+          <span>Custom software development</span>
+          <span>POS &amp; inventory software</span>
+          <span>Requirements analysis</span>
+          <span>Education ERP development</span>
+          <span>Ongoing project development</span>
+          <span>Collaboration with other developers</span>
+          <span>Training agents to implement the ERP in institutions</span>
+          <span>Support for existing projects</span>
+        </div>
+        <div class="tl-tech">Django · MySQL · PostgreSQL · SQLite · Bootstrap</div>
       </div>
     </div>
     <div style="margin-top:36px;">
-      <a href="#" class="btn">Download Full Resume ↓</a>
+      <a href="assets/Resume%20of%20Abu%20Nayem.pdf" target="_blank" rel="noopener" download="Resume of Abu Nayem.pdf" class="btn" title="Download Resume of Abu Nayem (PDF)">Download Full Resume ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AWARDS ============ -->
+<section class="section-pad" id="awards">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Awards &amp; Achievements</div>
+      <h2>Recognition along the way.</h2>
+      <p class="lede">Milestones from my career and academic journey.</p>
+    </div>
+    <div class="awards-grid reveal">
+      <div class="award-card">
+        <div class="award-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></div>
+        <div>
+          <div class="award-year">2021 – 2022</div>
+          <h3>Software Engineer of the Month <span class="award-highlight">3×</span></h3>
+          <p>Received the Software Engineer of the Month award three times.</p>
+          <div class="award-org">Esquire Technology Ltd.</div>
+        </div>
+      </div>
+      <div class="award-card">
+        <div class="award-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg></div>
+        <div>
+          <div class="award-year">2019</div>
+          <h3>Project Showcasing &amp; Competition</h3>
+          <p>Runner-up prize recipient.</p>
+          <div class="award-org">Green University of Bangladesh</div>
+        </div>
+      </div>
+      <div class="award-card">
+        <div class="award-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9 12 4 2 9l10 5 10-5Z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg></div>
+        <div>
+          <div class="award-year">2019</div>
+          <h3>VC Certificate <span class="award-highlight">CGPA 4.00</span></h3>
+          <p>Awarded for achieving highest honors in the 6th semester with a perfect 4.00 out of 4.</p>
+          <div class="award-org">Green University of Bangladesh</div>
+        </div>
+      </div>
+      <div class="award-card">
+        <div class="award-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M7 9h10M7 12.5h6"/><path d="m14 17-1 4 3-1.5 3 1.5-1-4"/></svg></div>
+        <div>
+          <div class="award-year">2020</div>
+          <h3>Dean Certificate <span class="award-highlight">CGPA 3.93</span></h3>
+          <p>Awarded for achieving highest honors in the 10th semester with 3.93 out of 4.</p>
+          <div class="award-org">Green University of Bangladesh</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -763,10 +1165,28 @@
         <div class="s-tech mono">PostgreSQL / MySQL / Indexing</div>
       </div>
       <div class="service-card">
+        <div class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20M6 6h.01M9 6h.01"/><path d="m10 12-2 2 2 2M14 12l2 2-2 2"/></svg></div>
+        <h3>Web Development</h3>
+        <p>Modern, responsive websites, web portals, and full-stack web applications built for speed, SEO, and scalability.</p>
+        <div class="s-tech mono">Django / Next.js / React / Tailwind</div>
+      </div>
+      <div class="service-card">
         <div class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
-        <h3>Deployment &amp; Infrastructure</h3>
-        <p>Shipping and running applications with Linux, Docker, Nginx, Gunicorn, and cloud infrastructure.</p>
-        <div class="s-tech mono">Docker / Nginx / CI-CD / Cloud</div>
+        <h3>Custom Software Development</h3>
+        <p>Tailor-made ERP, HRM, POS, inventory, and enterprise software designed around your exact business workflows.</p>
+        <div class="s-tech mono">ERP / HRM / POS / Business Systems</div>
+      </div>
+      <div class="service-card">
+        <div class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 5h4M12 18.5h.01"/></svg></div>
+        <h3>Mobile Apps Development</h3>
+        <p>Cross-platform iOS and Android mobile applications backed by high-performance REST APIs and real-time sync.</p>
+        <div class="s-tech mono">Flutter / REST APIs / Push &amp; Auth</div>
+      </div>
+      <div class="service-card">
+        <div class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></div>
+        <h3>DevOps Service</h3>
+        <p>CI/CD pipelines, containerization, Linux server provisioning, web server tuning, and cloud infrastructure management.</p>
+        <div class="s-tech mono">Docker / CI-CD / Nginx / Linux / Cloud</div>
       </div>
     </div>
   </div>
@@ -805,46 +1225,32 @@
       <p class="lede">Have a software idea, an AI project, or a business workflow that needs automation? Let's discuss how technology can turn it into reality.</p>
     </div>
     <div class="contact-grid">
-      <form class="reveal" id="contactForm">
-        <div class="field-row">
-          <div class="field">
-            <label for="cf-name">Name</label>
-            <input id="cf-name" name="name" type="text" placeholder="Your name" required />
-          </div>
-          <div class="field">
-            <label for="cf-email">Email</label>
-            <input id="cf-email" name="email" type="email" placeholder="you@company.com" required />
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="cf-type">Project type</label>
-            <select id="cf-type" name="projectType">
-              <option>Backend development</option>
-              <option>AI application</option>
-              <option>SaaS product</option>
-              <option>Business automation</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="cf-budget">Budget <span style="opacity:.6;">(optional)</span></label>
-            <input id="cf-budget" name="budget" type="text" placeholder="Rough range" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="cf-message">Message</label>
-          <textarea id="cf-message" name="message" placeholder="Tell me a bit about what you're building." required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Start a Conversation</button>
-        <p class="form-note">This form is a UI preview — connect it to your email or form service (e.g. Formspree, a serverless function) to receive submissions.</p>
-      </form>
+      <div class="contact-methods reveal">
+        <a class="contact-card" href="https://wa.me/8801991953820?text=Hi%20Nayem%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener">
+          <span class="cc-icon is-wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#ico-wa"/></svg></span>
+          <span class="cc-body">
+            <span class="cc-label" style="display:block;">WhatsApp</span>
+            <span class="cc-value" style="display:block;">+880 1991-953820</span>
+            <span class="cc-hint" style="display:block;">Fastest way to reach me — tap to start a chat.</span>
+          </span>
+          <svg class="cc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </a>
+        <a class="contact-card" href="mailto:naeem043@gmail.com?subject=Project%20inquiry">
+          <span class="cc-icon is-mail"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-mail"/></svg></span>
+          <span class="cc-body">
+            <span class="cc-label" style="display:block;">Email</span>
+            <span class="cc-value" style="display:block;">naeem043@gmail.com</span>
+            <span class="cc-hint" style="display:block;">For detailed briefs, proposals, or attachments.</span>
+          </span>
+          <svg class="cc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </a>
+        <p class="form-note">Share a bit about your project — what you're building, timeline, and rough budget — and I'll get back to you.</p>
+      </div>
       <div class="contact-side reveal">
         <div class="cs-block">
           <h4>Direct</h4>
           <div class="social-list">
-            <a href="mailto:your@email.com">Email <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg></a>
-            <a href="#" title="Add your resume link">Resume <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg></a>
+            <a href="assets/Resume%20of%20Abu%20Nayem.pdf" target="_blank" rel="noopener" download="Resume of Abu Nayem.pdf" title="Download Resume of Abu Nayem (PDF)">Resume <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg></a>
           </div>
         </div>
         <div class="cs-block">
@@ -880,7 +1286,8 @@
       <div class="footer-social">
         <a href="#" class="icon-btn" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg></a>
         <a href="#" class="icon-btn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg></a>
-        <a href="mailto:your@email.com" class="icon-btn" title="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg></a>
+        <a href="https://wa.me/8801991953820" target="_blank" rel="noopener" class="icon-btn" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><use href="#ico-wa"/></svg></a>
+        <a href="mailto:naeem043@gmail.com" class="icon-btn" title="Email" aria-label="Email"><svg viewBox="0 0 24 24"><use href="#ico-mail"/></svg></a>
       </div>
     </div>
     <div class="footer-bottom" style="border-top:none;padding-top:16px;">
@@ -891,6 +1298,25 @@
 </footer>
 
 <div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Image lightbox (project galleries) -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Project images" aria-hidden="true">
+  <div class="lb-top">
+    <div class="lb-title"><span id="lbTitle"></span><span class="lb-counter" id="lbCounter"></span></div>
+    <button class="lb-btn" id="lbClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="lb-stage" id="lbStage">
+    <button class="lb-btn lb-prev" id="lbPrev" type="button" aria-label="Previous image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <img class="lb-img" id="lbImg" alt="">
+    <button class="lb-btn lb-next" id="lbNext" type="button" aria-label="Next image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+  <div class="lb-strip" id="lbStrip"></div>
+</div>
+
+<!-- Floating WhatsApp button -->
+<a class="wa-float" href="https://wa.me/8801991953820?text=Hi%20Nayem%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#ico-wa"/></svg>
+</a>
 
 <script>
 (function(){
@@ -961,16 +1387,165 @@
     revealEls.forEach(function(el){ el.classList.add('is-visible'); });
   }
 
-  // ---- Contact form (UI only — no backend wired) ----
-  var form = document.getElementById('contactForm');
-  var toast = document.getElementById('toast');
-  var toastTimer;
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    toast.textContent = "This form isn't connected yet — wire it up to your email or form service to start receiving messages.";
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 4200);
+  // ---- Project galleries + lightbox ----
+  var ICON_PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 5l-7 7 7 7"/></svg>';
+  var ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg>';
+  var ICON_ZOOM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+  var ICON_IMGS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>';
+
+  var lb = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lbImg');
+  var lbTitle = document.getElementById('lbTitle');
+  var lbCounter = document.getElementById('lbCounter');
+  var lbStrip = document.getElementById('lbStrip');
+  var lbState = {images:[], index:0, title:'', onChange:null, lastFocus:null};
+
+  function lbShow(i){
+    var n = lbState.images.length;
+    lbState.index = (i + n) % n;
+    lbImg.classList.add('is-loading');
+    var src = lbState.images[lbState.index];
+    var pre = new Image();
+    pre.onload = pre.onerror = function(){
+      lbImg.src = src;
+      lbImg.alt = lbState.title + ' — image ' + (lbState.index + 1);
+      requestAnimationFrame(function(){ lbImg.classList.remove('is-loading'); });
+    };
+    pre.src = src;
+    lbCounter.textContent = n > 1 ? (lbState.index + 1) + ' / ' + n : '';
+    Array.prototype.forEach.call(lbStrip.children, function(b, k){
+      b.classList.toggle('is-active', k === lbState.index);
+      if(k === lbState.index && b.scrollIntoView) b.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'});
+    });
+    if(lbState.onChange) lbState.onChange(lbState.index);
+  }
+  function lbOpen(images, index, title, onChange){
+    lbState.images = images; lbState.title = title; lbState.onChange = onChange;
+    lbState.lastFocus = document.activeElement;
+    lbTitle.textContent = title;
+    lb.classList.toggle('lb-single', images.length < 2);
+    lbStrip.innerHTML = '';
+    images.forEach(function(src, k){
+      var b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('aria-label', 'Show image ' + (k + 1));
+      b.innerHTML = '<img src="' + src + '" alt="" loading="lazy">';
+      b.addEventListener('click', function(){ lbShow(k); });
+      lbStrip.appendChild(b);
+    });
+    lb.classList.add('is-open'); lb.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lb-open');
+    lbShow(index);
+    document.getElementById('lbClose').focus();
+  }
+  function lbClose(){
+    lb.classList.remove('is-open'); lb.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lb-open');
+    if(lbState.lastFocus && lbState.lastFocus.focus) lbState.lastFocus.focus();
+  }
+  document.getElementById('lbClose').addEventListener('click', lbClose);
+  document.getElementById('lbPrev').addEventListener('click', function(){ lbShow(lbState.index - 1); });
+  document.getElementById('lbNext').addEventListener('click', function(){ lbShow(lbState.index + 1); });
+  document.getElementById('lbStage').addEventListener('click', function(e){ if(e.target === this) lbClose(); });
+  document.addEventListener('keydown', function(e){
+    if(!lb.classList.contains('is-open')) return;
+    if(e.key === 'Escape') lbClose();
+    else if(e.key === 'ArrowLeft' && lbState.images.length > 1) lbShow(lbState.index - 1);
+    else if(e.key === 'ArrowRight' && lbState.images.length > 1) lbShow(lbState.index + 1);
+  });
+  (function(){ // swipe in lightbox
+    var x0 = null;
+    lb.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+    lb.addEventListener('touchend', function(e){
+      if(x0 === null || lbState.images.length < 2) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if(Math.abs(dx) > 45) lbShow(lbState.index + (dx < 0 ? 1 : -1));
+    });
+  })();
+
+  document.querySelectorAll('.project-visual[data-images]').forEach(function(box){
+    var images = (box.getAttribute('data-images') || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+    if(!images.length) return;
+    var project = box.closest('.project');
+    var title = project && project.querySelector('h3') ? project.querySelector('h3').textContent : 'Project';
+    var multi = images.length > 1;
+    var current = 0, timer = null;
+
+    box.classList.add('has-gallery');
+    box.setAttribute('role', 'button');
+    box.setAttribute('tabindex', '0');
+    box.setAttribute('aria-label', 'Open ' + title + ' images');
+    box.innerHTML = '';
+
+    var track = document.createElement('div'); track.className = 'pg-track';
+    var slides = images.map(function(src, k){
+      var img = document.createElement('img');
+      img.className = 'pg-slide' + (k === 0 ? ' is-active' : '');
+      img.src = src; img.alt = title + ' — image ' + (k + 1);
+      img.loading = 'lazy'; img.decoding = 'async';
+      track.appendChild(img);
+      return img;
+    });
+    box.appendChild(track);
+    box.insertAdjacentHTML('beforeend', '<span class="pg-zoom" aria-hidden="true">' + ICON_ZOOM + '</span>');
+
+    var thumbs = [];
+    function go(i){
+      current = (i + images.length) % images.length;
+      slides.forEach(function(s, k){ s.classList.toggle('is-active', k === current); });
+      thumbs.forEach(function(t, k){ t.classList.toggle('is-active', k === current); });
+      if(countEl) countEl.lastChild.textContent = (current + 1) + ' / ' + images.length;
+    }
+    var countEl = null;
+    if(multi){
+      box.insertAdjacentHTML('beforeend', '<div class="pg-shade"></div>');
+      countEl = document.createElement('span'); countEl.className = 'pg-count';
+      countEl.innerHTML = ICON_IMGS + '<span>1 / ' + images.length + '</span>';
+      box.appendChild(countEl);
+
+      var prev = document.createElement('button'); prev.type = 'button'; prev.className = 'pg-nav pg-prev'; prev.setAttribute('aria-label', 'Previous image'); prev.innerHTML = ICON_PREV;
+      var next = document.createElement('button'); next.type = 'button'; next.className = 'pg-nav pg-next'; next.setAttribute('aria-label', 'Next image'); next.innerHTML = ICON_NEXT;
+      prev.addEventListener('click', function(e){ e.stopPropagation(); go(current - 1); });
+      next.addEventListener('click', function(e){ e.stopPropagation(); go(current + 1); });
+      box.appendChild(prev); box.appendChild(next);
+
+      var strip = document.createElement('div'); strip.className = 'pg-thumbs';
+      images.slice(0, 6).forEach(function(src, k){
+        var t = document.createElement('button');
+        t.type = 'button'; t.className = 'pg-thumb' + (k === 0 ? ' is-active' : '');
+        t.setAttribute('aria-label', 'Show image ' + (k + 1));
+        t.innerHTML = '<img src="' + src + '" alt="" loading="lazy">';
+        t.addEventListener('click', function(e){ e.stopPropagation(); go(k); });
+        strip.appendChild(t); thumbs.push(t);
+      });
+      box.appendChild(strip);
+
+      // gentle autoplay while hovered-out & visible; pauses on hover
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function start(){ if(!reduced && !timer) timer = setInterval(function(){ go(current + 1); }, 4500); }
+      function stop(){ clearInterval(timer); timer = null; }
+      box.addEventListener('mouseenter', stop);
+      box.addEventListener('mouseleave', start);
+      if('IntersectionObserver' in window){
+        new IntersectionObserver(function(es){ es.forEach(function(en){ en.isIntersecting ? start() : stop(); }); }, {threshold:0.4}).observe(box);
+      }
+
+      // swipe on card
+      var sx = null;
+      box.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; stop(); }, {passive:true});
+      box.addEventListener('touchend', function(e){
+        if(sx === null) return;
+        var dx = e.changedTouches[0].clientX - sx; sx = null;
+        if(Math.abs(dx) > 40){ go(current + (dx < 0 ? 1 : -1)); box._swiped = true; setTimeout(function(){ box._swiped = false; }, 350); }
+      });
+    }
+
+    function open(){ if(box._swiped) return; lbOpen(images, current, title, function(i){ go(i); }); }
+    box.addEventListener('click', open);
+    box.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); }
+      else if(multi && e.key === 'ArrowLeft') go(current - 1);
+      else if(multi && e.key === 'ArrowRight') go(current + 1);
+    });
   });
 
   // ---- Footer year ----
